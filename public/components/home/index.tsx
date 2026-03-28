@@ -24,8 +24,8 @@ interface HomeIndexProps {
 }
 
 export default function HomeIndex({ initialPhotos, filters, initialFilter }: HomeIndexProps) {
-  // Parse initialFilter string to array, e.g. "LANDSCAPE,URBAN" -> ["#LANDSCAPE", "#URBAN"]
-  const initialActiveArr = initialFilter === "all" ? ["all"] : initialFilter.split(",").map(f => `#${f.toUpperCase()}`);
+  const safeFilter = initialFilter || "all";
+  const initialActiveArr = safeFilter === "all" ? ["all"] : safeFilter.split(",").map(f => `#${f.toUpperCase()}`);
 
   const [photos, setPhotos] = useState<Photo[]>(initialPhotos);
   const [isLoading, setIsLoading] = useState(false);
