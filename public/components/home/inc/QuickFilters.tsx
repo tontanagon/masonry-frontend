@@ -40,7 +40,7 @@ export default function QuickFilters({ filters, activeFilters, onFilterChange }:
       >
         all
       </button>
-      {filters.map((filter) => (
+      {filters?.map((filter) => (
         <button
           key={filter.label}
           onClick={() => handleFilterClick(filter.label)}

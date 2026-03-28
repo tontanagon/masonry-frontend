@@ -27,11 +27,12 @@ export default function HomeIndex({ initialPhotos, filters, initialFilter }: Hom
   const safeFilter = initialFilter || "all";
   const initialActiveArr = safeFilter === "all" ? ["all"] : safeFilter.split(",").map(f => `#${f.toUpperCase()}`);
 
-  const [photos, setPhotos] = useState<Photo[]>(initialPhotos);
+  const safePhotos = initialPhotos || [];
+  const [photos, setPhotos] = useState<Photo[]>(safePhotos);
   const [isLoading, setIsLoading] = useState(false);
   
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(initialPhotos.length === 8);
+  const [hasMore, setHasMore] = useState(safePhotos.length === 8);
   const [currentFilters, setCurrentFilters] = useState<string[]>(initialActiveArr);
   
   const observerTarget = useRef<HTMLDivElement>(null);
@@ -50,14 +51,21 @@ export default function HomeIndex({ initialPhotos, filters, initialFilter }: Hom
 
     try {
       // Prepare string like "LANDSCAPE,URBAN" for API by stripping #
-      let queryParam = "all";
+      let filterValue = "all";
       if (!activeFilters.includes("all")) {
-        queryParam = activeFilters.map(f => f.replace("#", "")).join(",");
+        filterValue = activeFilters.map(f => f.replace("#", "")).join(",");
       }
 
-      const res = await fetch(`/api/photos?filters=${encodeURIComponent(queryParam)}&page=${targetPage}`);
+      const res = await fetch(`/api/photos`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          filters: filterValue,
+          page: targetPage
+        })
+      });
       
-      if (!res.ok) throw new Error("Failed to fetch gallery from Next.js API");
+      if (!res.ok) throw new Error("Failed to search gallery from Next.js API");
       
       const newPhotos: Photo[] = await res.json();
       
@@ -96,6 +104,12 @@ export default function HomeIndex({ initialPhotos, filters, initialFilter }: Hom
     fetchPhotos(newActiveFilters, 1, false);
   }, []);
 
+  const handleTagClickFromCard = (tag: string) => {
+    // Normalizing tag format to match our internal state like "#TAG"
+    const formattedTag = `#${tag.toUpperCase()}`;
+    handleFilterChange([formattedTag]);
+  };
+
   // Infinite Scroll Logic
   const loadMore = useCallback(() => {
     if (!hasMore || loadingMoreRef.current || photos.length === 0) return;
@@ -123,9 +137,10 @@ export default function HomeIndex({ initialPhotos, filters, initialFilter }: Hom
 
   // If initialPhotos changes entirely because of SSR, reset state
   useEffect(() => {
-    setPhotos(initialPhotos);
+    const safePhotos = initialPhotos || [];
+    setPhotos(safePhotos);
     setPage(1);
-    setHasMore(initialPhotos.length === 8);
+    setHasMore(safePhotos.length === 8);
   }, [initialPhotos]);
 
   return (
@@ -166,6 +181,7 @@ export default function HomeIndex({ initialPhotos, filters, initialFilter }: Hom
                       imageSrc={photo.imageSrc}
                       title={photo.title}
                       tags={photo.tags}
+                      onTagClick={handleTagClickFromCard}
                     />
                   ))}
                 </Masonry>

@@ -18,11 +18,13 @@ async function getFilters() {
 // API Call for photos (SSR)
 async function getPhotos(filtersStr?: string) {
   try {
-    let endpoint = "/galleries?page=1";
-    if (filtersStr && filtersStr !== "all") {
-      endpoint += `&filters=${filtersStr}`;
-    }
-    const backendData = await fetchFromBackend(endpoint);
+    const backendData = await fetchFromBackend("/galleries/search", {
+      method: "POST",
+      body: JSON.stringify({
+        filters: filtersStr || "all",
+        page: 1
+      })
+    });
     return (backendData.data || []).map((item: any) => ({
       id: item.ID || item.id,
       imageSrc: item.ImageURL || item.image_url || "https://placehold.co/600x600/e2e8f0/64748b?font=inter&text=No+Image",
