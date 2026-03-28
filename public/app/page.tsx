@@ -27,7 +27,7 @@ async function getPhotos(filtersStr?: string) {
     });
     return (backendData.data || []).map((item: any) => ({
       id: item.ID || item.id,
-      imageSrc: item.ImageURL || item.image_url || "https://placehold.co/600x600/e2e8f0/64748b?font=inter&text=No+Image",
+      imageSrc: item.image || item.image_url || "https://placehold.co/600x600/e2e8f0/64748b?font=inter&text=No+Image",
       title: item.Title || item.title || "Untitled",
       tags: (item.Hashtags || item.hashtags || []).map((tag: any) => tag.Name || tag.name || String(tag)),
     }));

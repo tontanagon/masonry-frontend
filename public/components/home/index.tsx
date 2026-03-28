@@ -30,6 +30,7 @@ export default function HomeIndex({ initialPhotos, filters, initialFilter }: Hom
   const safePhotos = initialPhotos || [];
   const [photos, setPhotos] = useState<Photo[]>(safePhotos);
   const [isLoading, setIsLoading] = useState(false);
+  console.log(photos);
   
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(safePhotos.length === 8);
@@ -106,7 +107,7 @@ export default function HomeIndex({ initialPhotos, filters, initialFilter }: Hom
 
   const handleTagClickFromCard = (tag: string) => {
     // Normalizing tag format to match our internal state like "#TAG"
-    const formattedTag = `#${tag.toUpperCase()}`;
+    const formattedTag = `#${tag.toLowerCase()}`;
     handleFilterChange([formattedTag]);
   };
 
