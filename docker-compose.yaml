@@ -1,0 +1,17 @@
+services:
+  masonry-frontend:
+    container_name: masonry-frontend
+    image: node:24.3.0
+    restart: always
+    working_dir: /app
+    command: sh -c "npm install && npm run dev"
+    volumes:
+      - "./public:/app"
+    ports:
+      - ${PUBLIC_PORT}:3000
+    networks:
+      - masonry
+
+networks:
+  masonry:
+    external: true

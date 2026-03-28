@@ -1,0 +1,6 @@
+.env
+.git
+public/.next
+public/node_modules
+public/.git
+README.md
