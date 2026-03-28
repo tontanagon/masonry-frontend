@@ -16,9 +16,13 @@ async function getFilters() {
 }
 
 // API Call for photos (SSR)
-async function getPhotos() {
+async function getPhotos(filtersStr?: string) {
   try {
-    const backendData = await fetchFromBackend("/galleries");
+    let endpoint = "/galleries?page=1";
+    if (filtersStr && filtersStr !== "all") {
+      endpoint += `&filters=${filtersStr}`;
+    }
+    const backendData = await fetchFromBackend(endpoint);
     return (backendData.data || []).map((item: any) => ({
       id: item.ID || item.id,
       imageSrc: item.ImageURL || item.image_url || "https://placehold.co/600x600/e2e8f0/64748b?font=inter&text=No+Image",
@@ -31,13 +35,20 @@ async function getPhotos() {
   }
 }
 
-export default async function Home() {
+type Props = {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export default async function Home(props: Props) {
+  const searchParams = await props.searchParams;
+  const filtersParam = typeof searchParams.filters === 'string' ? searchParams.filters : undefined;
+
   const [filters, photos] = await Promise.all([
     getFilters(),
-    getPhotos(),
+    getPhotos(filtersParam),
   ]);
 
   return (
-    <HomeIndex filters={filters} photos={photos} />
+    <HomeIndex initialPhotos={photos} filters={filters} initialFilter={filtersParam || "all"} />
   );
 }

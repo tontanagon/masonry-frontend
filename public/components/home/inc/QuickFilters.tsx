@@ -1,5 +1,4 @@
 "use client";
-import { useState } from "react";
 
 interface FilterType {
   label: string;
@@ -7,12 +6,11 @@ interface FilterType {
 
 interface QuickFiltersProps {
   filters: FilterType[];
+  activeFilters: string[];
   onFilterChange: (activeFilters: string[]) => void;
 }
 
-export default function QuickFilters({ filters, onFilterChange }: QuickFiltersProps) {
-  const [activeFilters, setActiveFilters] = useState<string[]>(["all"]);
-
+export default function QuickFilters({ filters, activeFilters, onFilterChange }: QuickFiltersProps) {
   function handleFilterClick(filter: string) {
     let newFilters: string[] = [];
 
@@ -27,7 +25,6 @@ export default function QuickFilters({ filters, onFilterChange }: QuickFiltersPr
       }
     }
 
-    setActiveFilters(newFilters);
     onFilterChange(newFilters);
   }
 
